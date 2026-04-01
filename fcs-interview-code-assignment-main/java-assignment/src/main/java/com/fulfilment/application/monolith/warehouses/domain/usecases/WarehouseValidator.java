@@ -22,6 +22,10 @@ public class WarehouseValidator {
           "Warehouse with businessUnitCode " + warehouse.businessUnitCode + " already exists.");
     }
 
+    validateStock(warehouse);
+  }
+
+  public void validateStock(Warehouse warehouse) {
     if (warehouse.stock != null && warehouse.capacity != null && warehouse.stock > warehouse.capacity) {
       throw new IllegalArgumentException(
           "Stock (" + warehouse.stock + ") cannot be greater than capacity (" + warehouse.capacity + ").");
@@ -35,14 +39,17 @@ public class WarehouseValidator {
   public void validateLocation(Warehouse warehouse, String excludeBusinessUnitCode) {
     var location = locationResolver.resolveByIdentifier(warehouse.location);
 
-    long activeCount = warehouseStore.countActiveByLocation(warehouse.location);
-    if (activeCount >= location.maxNumberOfWarehouses) {
-      throw new IllegalArgumentException(
-          "Location " + warehouse.location + " has reached the maximum number of warehouses (" + location.maxNumberOfWarehouses + ").");
+    if (excludeBusinessUnitCode == null) {
+      long activeCount = warehouseStore.countActiveByLocation(warehouse.location);
+      if (activeCount >= location.maxNumberOfWarehouses) {
+        throw new IllegalArgumentException(
+            "Location " + warehouse.location + " has reached the maximum number of warehouses (" + location.maxNumberOfWarehouses + ").");
+      }
     }
 
     int usedCapacity = warehouseStore.getAll().stream()
-        .filter(w -> warehouse.location.equals(w.location))
+        .filter(w -> warehouse.location.equals(w.location)
+            && (excludeBusinessUnitCode == null || !excludeBusinessUnitCode.equals(w.businessUnitCode)))
         .mapToInt(w -> w.capacity != null ? w.capacity : 0)
         .sum();
     if (usedCapacity + warehouse.capacity > location.maxCapacity) {

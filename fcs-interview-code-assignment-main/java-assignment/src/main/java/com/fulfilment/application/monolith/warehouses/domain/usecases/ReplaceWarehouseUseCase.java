@@ -19,6 +19,7 @@ public class ReplaceWarehouseUseCase implements ReplaceWarehouseOperation {
 
   @Override
   public void replace(Warehouse newWarehouse) {
+    warehouseValidator.validateStock(newWarehouse);
     warehouseValidator.validateLocation(newWarehouse, newWarehouse.businessUnitCode);
 
     newWarehouse.createdAt = LocalDateTime.now();
