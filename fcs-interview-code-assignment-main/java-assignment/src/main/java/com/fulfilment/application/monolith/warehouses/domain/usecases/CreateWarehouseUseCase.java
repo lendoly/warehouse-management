@@ -32,6 +32,16 @@ public class CreateWarehouseUseCase implements CreateWarehouseOperation {
           "Location " + warehouse.location + " has reached the maximum number of warehouses (" + location.maxNumberOfWarehouses + ").");
     }
 
+    int usedCapacity = warehouseStore.getAll().stream()
+        .filter(w -> warehouse.location.equals(w.location) && w.archivedAt == null)
+        .mapToInt(w -> w.capacity != null ? w.capacity : 0)
+        .sum();
+    if (usedCapacity + warehouse.capacity > location.maxCapacity) {
+      throw new IllegalArgumentException(
+          "Location " + warehouse.location + " would exceed maximum capacity of " + location.maxCapacity
+          + " (current: " + usedCapacity + ", requested: " + warehouse.capacity + ").");
+    }
+
     // if all went well, create the warehouse
     warehouseStore.create(warehouse);
   }
