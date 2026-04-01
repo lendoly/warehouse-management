@@ -13,6 +13,7 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
 
+
 @RequestScoped
 public class WarehouseResourceImpl implements WarehouseResource {
 
