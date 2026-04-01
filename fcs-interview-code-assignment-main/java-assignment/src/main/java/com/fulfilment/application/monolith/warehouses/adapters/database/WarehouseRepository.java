@@ -16,25 +16,38 @@ public class WarehouseRepository implements WarehouseStore, PanacheRepository<Db
 
   @Override
   public void create(Warehouse warehouse) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'create'");
+    var dbWarehouse = warehouse.toDbWarehouse();
+    this.persist(dbWarehouse);
   }
 
   @Override
   public void update(Warehouse warehouse) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'replace'");
+    DbWarehouse dbWarehouse = this.find("businessUnitCode", warehouse.businessUnitCode).firstResult();
+    if (dbWarehouse == null) {
+      throw new IllegalArgumentException("Warehouse not found: " + warehouse.businessUnitCode);
+    }
+    dbWarehouse.location = warehouse.location;
+    dbWarehouse.capacity = warehouse.capacity;
+    dbWarehouse.stock = warehouse.stock;
+    dbWarehouse.createdAt = warehouse.createdAt;
+    dbWarehouse.archivedAt = warehouse.archivedAt;
   }
 
   @Override
   public void remove(Warehouse warehouse) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'remove'");
+    DbWarehouse dbWarehouse = this.find("businessUnitCode", warehouse.businessUnitCode).firstResult();
+    if (dbWarehouse == null) {
+      throw new IllegalArgumentException("Warehouse not found: " + warehouse.businessUnitCode);
+    }
+    this.delete(dbWarehouse);
   }
 
   @Override
   public Warehouse findByBusinessUnitCode(String buCode) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'findById'");
+    DbWarehouse dbWarehouse = this.find("businessUnitCode", buCode).firstResult();
+    if (dbWarehouse == null) {
+      return null;
+    }
+    return dbWarehouse.toWarehouse();
   }
 }

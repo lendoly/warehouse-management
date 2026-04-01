@@ -25,6 +25,88 @@
       var app = angular.module("ProductManagement", []);
 
       //Controller Part
+      app.controller("WarehouseManagementController", function ($scope, $http) {
+
+        $scope.warehouses = [];
+
+        $scope.form = {
+          businessUnitCode: "",
+          location: "",
+          capacity: 0,
+          stock: 0,
+          isEdit: false
+        };
+
+        _refreshWarehouseData();
+
+        $scope.update = function () {
+          var method = "";
+          var url = "";
+          var data = {
+            businessUnitCode: $scope.form.businessUnitCode,
+            location: $scope.form.location,
+            capacity: $scope.form.capacity,
+            stock: $scope.form.stock
+          };
+          if ($scope.form.isEdit) {
+            method = "POST";
+            url = '/warehouse/' + $scope.form.businessUnitCode + '/replacement';
+          } else {
+            method = "POST";
+            url = '/warehouse';
+          }
+          $http({
+            method: method,
+            url: url,
+            data: angular.toJson(data),
+            headers: { 'Content-Type': 'application/json' }
+          }).then(_success, _error);
+        };
+
+        $scope.archive = function (warehouse) {
+          $http({
+            method: 'DELETE',
+            url: '/warehouse/' + warehouse.businessUnitCode
+          }).then(_success, _error);
+        };
+
+        $scope.edit = function (warehouse) {
+          $scope.form.businessUnitCode = warehouse.businessUnitCode;
+          $scope.form.location = warehouse.location;
+          $scope.form.capacity = warehouse.capacity;
+          $scope.form.stock = warehouse.stock;
+          $scope.form.isEdit = true;
+        };
+
+        function _refreshWarehouseData() {
+          $http({
+            method: 'GET',
+            url: '/warehouse'
+          }).then(function successCallback(response) {
+            $scope.warehouses = response.data;
+          }, function errorCallback(response) {
+            console.log(response.statusText);
+          });
+        }
+
+        function _success(response) {
+          _refreshWarehouseData();
+          _clearForm();
+        }
+
+        function _error(response) {
+          alert(response.data.message || response.statusText);
+        }
+
+        function _clearForm() {
+          $scope.form.businessUnitCode = "";
+          $scope.form.location = "";
+          $scope.form.capacity = 0;
+          $scope.form.stock = 0;
+          $scope.form.isEdit = false;
+        }
+      });
+
       app.controller("ProductManagementController", function ($scope, $http) {
 
         //Initialize page with default data which is blank in this example
@@ -109,7 +191,7 @@
       });
     </script>
 </head>
-<body ng-app="ProductManagement" ng-controller="ProductManagementController">
+<body ng-app="ProductManagement">
 
 <div class="container">
     <h1>Java Code Assignment</h1>
@@ -117,6 +199,37 @@
         This management interface invokes the CRUD service endpoint, which interacts with a database using JPA and several other well known libraries.
     </p>
 
+    <div ng-controller="WarehouseManagementController">
+    <h3>Add/Replace a Warehouse Unit</h3>
+    <form ng-submit="update()">
+        <div class="row">
+            <div class="col-3"><input type="text" placeholder="Business Unit Code" ng-model="form.businessUnitCode" ng-disabled="form.isEdit" size="30"/></div>
+            <div class="col-3"><input type="text" placeholder="Location" ng-model="form.location" size="30"/></div>
+            <div class="col-3"><input type="number" placeholder="Capacity" ng-model="form.capacity"/></div>
+            <div class="col-3"><input type="number" placeholder="Stock" ng-model="form.stock"/></div>
+        </div>
+        <input type="submit" value="Save"/>
+    </form>
+
+    <h3>Warehouse List</h3>
+    <div class="row">
+        <div class="col-3">Business Unit Code</div>
+        <div class="col-3">Location</div>
+        <div class="col-2">Capacity</div>
+        <div class="col-2">Stock</div>
+    </div>
+    <div class="row" ng-repeat="warehouse in warehouses">
+        <div class="col-3">{{ warehouse.businessUnitCode }}</div>
+        <div class="col-3">{{ warehouse.location }}</div>
+        <div class="col-2">{{ warehouse.capacity }}</div>
+        <div class="col-2">{{ warehouse.stock }}</div>
+        <div class="col-2"><a ng-click="edit(warehouse)" class="btn">Replace</a> <a ng-click="archive(warehouse)" class="btn">Archive</a></div>
+    </div>
+    </div>
+
+    <hr/>
+
+    <div ng-controller="ProductManagementController">
     <h3>Add/Edit an Product to the Warehouse</h3>
     <form ng-submit="update()">
         <div class="row">
@@ -133,6 +246,8 @@
         <div class="col-2">{{ product.name }}</div>
         <div class="col-8"><a ng-click="edit( product )" class="btn">Edit</a> <a ng-click="remove( product )" class="btn">Remove</a>
         </div>
+    </div>
+
     </div>
 
     <p>Behind the scenes, we have:
