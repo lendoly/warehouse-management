@@ -76,7 +76,11 @@ public class WarehouseResourceImpl implements WarehouseResource {
     existing.location = data.getLocation();
     existing.capacity = data.getCapacity();
     existing.stock = data.getStock();
-    replaceWarehouseOperation.replace(existing);
+    try {
+      replaceWarehouseOperation.replace(existing);
+    } catch (IllegalArgumentException e) {
+      throw new jakarta.ws.rs.WebApplicationException(e.getMessage(), 400);
+    }
     return toWarehouseResponse(existing);
   }
 
