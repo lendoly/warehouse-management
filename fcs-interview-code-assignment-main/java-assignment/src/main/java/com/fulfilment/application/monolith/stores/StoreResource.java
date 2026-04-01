@@ -134,6 +134,8 @@ public class StoreResource {
       int code = 500;
       if (exception instanceof WebApplicationException) {
         code = ((WebApplicationException) exception).getResponse().getStatus();
+      } else if (exception instanceof IllegalArgumentException) {
+        code = 400;
       }
 
       ObjectNode exceptionJson = objectMapper.createObjectNode();

@@ -35,7 +35,11 @@ public class WarehouseResourceImpl implements WarehouseResource {
     warehouse.capacity = data.getCapacity();
     warehouse.stock = data.getStock();
 
-    createWarehouseOperation.create(warehouse);
+    try {
+      createWarehouseOperation.create(warehouse);
+    } catch (IllegalArgumentException e) {
+      throw new jakarta.ws.rs.WebApplicationException(e.getMessage(), 400);
+    }
 
     return toWarehouseResponse(warehouse);
   }

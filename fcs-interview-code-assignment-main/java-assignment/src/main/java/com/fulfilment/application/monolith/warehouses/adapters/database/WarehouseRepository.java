@@ -50,4 +50,9 @@ public class WarehouseRepository implements WarehouseStore, PanacheRepository<Db
     }
     return dbWarehouse.toWarehouse();
   }
+
+  @Override
+  public long countActiveByLocation(String location) {
+    return this.count("location = ?1 and archivedAt is null", location);
+  }
 }
