@@ -107,6 +107,87 @@
         }
       });
 
+      app.controller("StoreManagementController", function ($scope, $http) {
+
+        $scope.stores = [];
+        $scope.form = { id: null, name: "", quantityProductsInStock: 0, isEdit: false };
+
+        _refresh();
+
+        $scope.update = function () {
+          var method = $scope.form.isEdit ? "PUT" : "POST";
+          var url = $scope.form.isEdit ? "/store/" + $scope.form.id : "/store";
+          $http({
+            method: method,
+            url: url,
+            data: angular.toJson({ name: $scope.form.name, quantityProductsInStock: $scope.form.quantityProductsInStock }),
+            headers: { "Content-Type": "application/json" }
+          }).then(function () { _refresh(); _clear(); }, _error);
+        };
+
+        $scope.edit = function (store) {
+          $scope.form.id = store.id;
+          $scope.form.name = store.name;
+          $scope.form.quantityProductsInStock = store.quantityProductsInStock;
+          $scope.form.isEdit = true;
+        };
+
+        $scope.remove = function (store) {
+          $http({ method: "DELETE", url: "/store/" + store.id })
+            .then(function () { _refresh(); }, _error);
+        };
+
+        function _refresh() {
+          $http({ method: "GET", url: "/store" }).then(function (r) {
+            $scope.stores = r.data;
+          }, function (r) { console.log(r.statusText); });
+        }
+
+        function _error(response) {
+          alert(response.data.error || response.statusText);
+        }
+
+        function _clear() {
+          $scope.form = { id: null, name: "", quantityProductsInStock: 0, isEdit: false };
+        }
+      });
+
+      app.controller("FulfillmentManagementController", function ($scope, $http) {
+
+        $scope.fulfillments = [];
+        $scope.form = { storeId: "", productId: "", warehouseBusinessUnitCode: "" };
+
+        _refresh();
+
+        $scope.create = function () {
+          $http({
+            method: "POST",
+            url: "/fulfillment",
+            data: angular.toJson($scope.form),
+            headers: { "Content-Type": "application/json" }
+          }).then(function () { _refresh(); _clear(); }, _error);
+        };
+
+        $scope.remove = function (fulfillment) {
+          $http({ method: "DELETE", url: "/fulfillment/" + fulfillment.id })
+            .then(_refresh, _error);
+        };
+
+        function _refresh() {
+          $http({ method: "GET", url: "/fulfillment" }).then(function (r) {
+            $scope.fulfillments = r.data;
+          }, function (r) { console.log(r.statusText); });
+        }
+
+        function _error(response) {
+          alert(response.data.error || response.statusText);
+        }
+
+        function _clear() {
+          $scope.form = { storeId: "", productId: "", warehouseBusinessUnitCode: "" };
+        }
+      });
+
       app.controller("ProductManagementController", function ($scope, $http) {
 
         //Initialize page with default data which is blank in this example
@@ -230,6 +311,61 @@
 
     <hr/>
 
+    <div ng-controller="StoreManagementController">
+    <h3>Add/Edit a Store</h3>
+    <form ng-submit="update()">
+        <div class="row">
+            <div class="col-5"><input type="text" placeholder="Name" ng-model="form.name" size="40"/></div>
+            <div class="col-4"><input type="number" placeholder="Quantity Products in Stock" ng-model="form.quantityProductsInStock"/></div>
+        </div>
+        <input type="submit" value="Save"/>
+    </form>
+
+    <h3>Store List</h3>
+    <div class="row">
+        <div class="col-1">ID</div>
+        <div class="col-4">Name</div>
+        <div class="col-3">Qty in Stock</div>
+        <div class="col-4"></div>
+    </div>
+    <div class="row" ng-repeat="store in stores">
+        <div class="col-1">{{ store.id }}</div>
+        <div class="col-4">{{ store.name }}</div>
+        <div class="col-3">{{ store.quantityProductsInStock }}</div>
+        <div class="col-4"><a ng-click="edit(store)" class="btn">Edit</a> <a ng-click="remove(store)" class="btn">Remove</a></div>
+    </div>
+    </div>
+
+    <hr/>
+
+    <div ng-controller="FulfillmentManagementController">
+    <h3>Assign Warehouse as Fulfillment Unit</h3>
+    <form ng-submit="create()">
+        <div class="row">
+            <div class="col-3"><input type="number" placeholder="Store ID" ng-model="form.storeId"/></div>
+            <div class="col-3"><input type="number" placeholder="Product ID" ng-model="form.productId"/></div>
+            <div class="col-4"><input type="text" placeholder="Warehouse Business Unit Code" ng-model="form.warehouseBusinessUnitCode" size="30"/></div>
+        </div>
+        <input type="submit" value="Assign"/>
+    </form>
+
+    <h3>Fulfillment Units</h3>
+    <div class="row">
+        <div class="col-2">Store ID</div>
+        <div class="col-2">Product ID</div>
+        <div class="col-4">Warehouse</div>
+        <div class="col-4"></div>
+    </div>
+    <div class="row" ng-repeat="f in fulfillments">
+        <div class="col-2">{{ f.storeId }}</div>
+        <div class="col-2">{{ f.productId }}</div>
+        <div class="col-4">{{ f.warehouseBusinessUnitCode }}</div>
+        <div class="col-4"><a ng-click="remove(f)" class="btn">Remove</a></div>
+    </div>
+    </div>
+
+    <hr/>
+
     <div ng-controller="ProductManagementController">
     <h3>Add/Edit an Product to the Warehouse</h3>
     <form ng-submit="update()">
@@ -241,10 +377,12 @@
 
     <h3>Product List</h3>
     <div class="row">
-        <div class="col-2">Name</div>
+        <div class="col-1">ID</div>
+        <div class="col-3">Name</div>
     </div>
     <div class="row" ng-repeat="product in products">
-        <div class="col-2">{{ product.name }}</div>
+        <div class="col-1">{{ product.id }}</div>
+        <div class="col-3">{{ product.name }}</div>
         <div class="col-8"><a ng-click="edit( product )" class="btn">Edit</a> <a ng-click="remove( product )" class="btn">Remove</a>
         </div>
     </div>
