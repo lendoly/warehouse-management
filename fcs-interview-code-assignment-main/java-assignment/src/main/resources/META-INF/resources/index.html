@@ -213,17 +213,18 @@
 
     <h3>Warehouse List</h3>
     <div class="row">
-        <div class="col-3">Business Unit Code</div>
+        <div class="col-2">Business Unit Code</div>
         <div class="col-3">Location</div>
-        <div class="col-2">Capacity</div>
-        <div class="col-2">Stock</div>
+        <div class="col-1">Capacity</div>
+        <div class="col-1">Stock</div>
+        <div class="col-5"></div>
     </div>
     <div class="row" ng-repeat="warehouse in warehouses">
-        <div class="col-3">{{ warehouse.businessUnitCode }}</div>
+        <div class="col-2">{{ warehouse.businessUnitCode }}</div>
         <div class="col-3">{{ warehouse.location }}</div>
-        <div class="col-2">{{ warehouse.capacity }}</div>
-        <div class="col-2">{{ warehouse.stock }}</div>
-        <div class="col-2"><a ng-click="edit(warehouse)" class="btn">Replace</a> <a ng-click="archive(warehouse)" class="btn">Archive</a></div>
+        <div class="col-1">{{ warehouse.capacity }}</div>
+        <div class="col-1">{{ warehouse.stock }}</div>
+        <div class="col-5"><a ng-click="edit(warehouse)" class="btn">Replace</a> <a ng-click="archive(warehouse)" class="btn">Archive</a></div>
     </div>
     </div>
 
