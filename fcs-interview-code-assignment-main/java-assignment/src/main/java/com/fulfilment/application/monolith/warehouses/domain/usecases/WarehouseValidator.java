@@ -21,6 +21,11 @@ public class WarehouseValidator {
       throw new IllegalArgumentException(
           "Warehouse with businessUnitCode " + warehouse.businessUnitCode + " already exists.");
     }
+
+    if (warehouse.stock != null && warehouse.capacity != null && warehouse.stock > warehouse.capacity) {
+      throw new IllegalArgumentException(
+          "Stock (" + warehouse.stock + ") cannot be greater than capacity (" + warehouse.capacity + ").");
+    }
   }
 
   /**
