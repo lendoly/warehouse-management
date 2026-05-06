@@ -22,7 +22,9 @@ public class WarehouseRepository implements WarehouseStore, PanacheRepository<Db
 
   @Override
   public void update(Warehouse warehouse) {
-    DbWarehouse dbWarehouse = this.find("businessUnitCode", warehouse.businessUnitCode).firstResult();
+    DbWarehouse dbWarehouse =
+        this.find("businessUnitCode = ?1 and archivedAt is null", warehouse.businessUnitCode)
+            .firstResult();
     if (dbWarehouse == null) {
       throw new IllegalArgumentException("Warehouse not found: " + warehouse.businessUnitCode);
     }
@@ -44,7 +46,8 @@ public class WarehouseRepository implements WarehouseStore, PanacheRepository<Db
 
   @Override
   public Warehouse findByBusinessUnitCode(String buCode) {
-    DbWarehouse dbWarehouse = this.find("businessUnitCode", buCode).firstResult();
+    DbWarehouse dbWarehouse =
+        this.find("businessUnitCode = ?1 and archivedAt is null", buCode).firstResult();
     if (dbWarehouse == null) {
       return null;
     }

@@ -16,7 +16,7 @@ public class DbWarehouse {
 
   @Id @GeneratedValue public Long id;
 
-  @Column(unique = true)
+  // uniqueness among active warehouses is enforced at application level to allow replace history
   public String businessUnitCode;
 
   public String location;

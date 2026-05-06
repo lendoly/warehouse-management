@@ -75,21 +75,19 @@ public class WarehouseResourceImpl implements WarehouseResource {
       throw new jakarta.ws.rs.WebApplicationException("Warehouse with id " + businessUnitCode + " does not exist.", 404);
     }
 
-    if (data.getStock() != null && !data.getStock().equals(existing.stock)) {
-      throw new jakarta.ws.rs.WebApplicationException(
-          "Stock cannot be changed during a replace operation. Current stock: " + existing.stock, 400);
-    }
-
-    existing.location = data.getLocation();
-    existing.capacity = data.getCapacity();
+    var newWarehouse = new com.fulfilment.application.monolith.warehouses.domain.models.Warehouse();
+    newWarehouse.businessUnitCode = businessUnitCode;
+    newWarehouse.location = data.getLocation();
+    newWarehouse.capacity = data.getCapacity();
+    newWarehouse.stock = existing.stock; // stock is always transferred from the existing warehouse
 
     try {
-      replaceWarehouseOperation.replace(existing);
+      replaceWarehouseOperation.replace(newWarehouse);
     } catch (IllegalArgumentException e) {
       throw new jakarta.ws.rs.WebApplicationException(e.getMessage(), 400);
     }
-    
-    return toWarehouseResponse(existing);
+
+    return toWarehouseResponse(newWarehouse);
   }
 
   private Warehouse toWarehouseResponse(
