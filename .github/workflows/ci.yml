@@ -41,6 +41,31 @@ jobs:
         working-directory: fcs-interview-code-assignment-main/java-assignment
         run: ./mvnw test
 
+      - name: Print coverage summary
+        if: always()
+        working-directory: fcs-interview-code-assignment-main/java-assignment
+        run: |
+          python3 - <<'EOF'
+          import xml.etree.ElementTree as ET
+
+          tree = ET.parse("target/jacoco-report/jacoco.xml")
+          root = tree.getroot()
+
+          print("\n========== Test Coverage Summary ==========")
+          print(f"{'Type':<15} {'Covered':>10} {'Missed':>10} {'Total':>10} {'Coverage':>10}")
+          print("-" * 58)
+
+          for counter in root.findall("counter"):
+              ctype = counter.get("type")
+              covered = int(counter.get("covered", 0))
+              missed  = int(counter.get("missed",  0))
+              total   = covered + missed
+              pct     = (covered / total * 100) if total > 0 else 0.0
+              print(f"{ctype:<15} {covered:>10} {missed:>10} {total:>10} {pct:>9.1f}%")
+
+          print("=" * 58)
+          EOF
+
       - name: Upload coverage report
         if: always()
         uses: actions/upload-artifact@v4
