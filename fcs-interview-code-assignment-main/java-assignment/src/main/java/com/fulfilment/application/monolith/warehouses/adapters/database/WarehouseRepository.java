@@ -45,9 +45,9 @@ public class WarehouseRepository implements WarehouseStore, PanacheRepository<Db
   }
 
   @Override
-  public Warehouse findByBusinessUnitCode(String buCode) {
+  public Warehouse findWarehouseById(String id) {
     DbWarehouse dbWarehouse =
-        this.find("businessUnitCode = ?1 and archivedAt is null", buCode).firstResult();
+        this.find("businessUnitCode = ?1 and archivedAt is null", id).firstResult();
     if (dbWarehouse == null) {
       return null;
     }

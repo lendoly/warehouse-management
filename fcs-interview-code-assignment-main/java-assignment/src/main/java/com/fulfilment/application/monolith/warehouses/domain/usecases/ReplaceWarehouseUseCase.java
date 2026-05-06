@@ -20,7 +20,7 @@ public class ReplaceWarehouseUseCase implements ReplaceWarehouseOperation {
 
   @Override
   public void replace(Warehouse newWarehouse) {
-    Warehouse existing = warehouseStore.findByBusinessUnitCode(newWarehouse.businessUnitCode);
+    Warehouse existing = warehouseStore.findWarehouseById(newWarehouse.businessUnitCode);
     if (existing == null) {
       throw new IllegalArgumentException(
           "Warehouse with businessUnitCode " + newWarehouse.businessUnitCode + " not found.");

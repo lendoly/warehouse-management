@@ -47,7 +47,7 @@ public class WarehouseResourceImpl implements WarehouseResource {
 
   @Override
   public Warehouse getAWarehouseUnitByID(String id) {
-    var warehouse = warehouseRepository.findByBusinessUnitCode(id);
+    var warehouse = warehouseRepository.findWarehouseById(id);
     if (warehouse == null) {
       throw new jakarta.ws.rs.WebApplicationException("Warehouse with id " + id + " does not exist.", 404);
     }
@@ -57,7 +57,7 @@ public class WarehouseResourceImpl implements WarehouseResource {
   @Transactional
   @Override
   public void archiveAWarehouseUnitByID(String id) {
-    var warehouse = warehouseRepository.findByBusinessUnitCode(id);
+    var warehouse = warehouseRepository.findWarehouseById(id);
     if (warehouse == null) {
       throw new jakarta.ws.rs.WebApplicationException("Warehouse with id " + id + " does not exist.", 404);
     }
@@ -69,7 +69,7 @@ public class WarehouseResourceImpl implements WarehouseResource {
   @Override
   public Warehouse replaceTheCurrentActiveWarehouse(
       String businessUnitCode, @NotNull Warehouse data) {
-    var existing = warehouseRepository.findByBusinessUnitCode(businessUnitCode);
+    var existing = warehouseRepository.findWarehouseById(businessUnitCode);
 
     if (existing == null) {
       throw new jakarta.ws.rs.WebApplicationException("Warehouse with id " + businessUnitCode + " does not exist.", 404);

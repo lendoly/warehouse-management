@@ -17,7 +17,7 @@ public class WarehouseValidator {
   }
 
   public void validateWarehouse(Warehouse warehouse) {
-    if (warehouseStore.findByBusinessUnitCode(warehouse.businessUnitCode) != null) {
+    if (warehouseStore.findWarehouseById(warehouse.businessUnitCode) != null) {
       throw new IllegalArgumentException(
           "Warehouse with businessUnitCode " + warehouse.businessUnitCode + " already exists.");
     }

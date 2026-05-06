@@ -54,7 +54,7 @@ public class FulfillmentResource {
     if (productRepository.findById(request.productId) == null) {
       throw new WebApplicationException("Product not found: " + request.productId, 404);
     }
-    if (warehouseRepository.findByBusinessUnitCode(request.warehouseBusinessUnitCode) == null) {
+    if (warehouseRepository.findWarehouseById(request.warehouseBusinessUnitCode) == null) {
       throw new WebApplicationException("Warehouse not found: " + request.warehouseBusinessUnitCode, 404);
     }
 
